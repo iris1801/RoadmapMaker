@@ -159,68 +159,34 @@ def init_db():
         
         # Verifica se ci sono già milestone
         if Milestone.query.count() == 0:
+            # Milestone di esempio (opzionali - rimuovi se non desiderate)
             sample_milestones = [
                 {
-                    'title': 'Avvio e Analisi',
-                    'description': 'Kickoff e definizione requisiti',
-                    'detailed_description': 'Kickoff meeting con cliente per allineamento obiettivi. Raccolta dettagli su contenuti e branding. Definizione requisiti tecnici e setup repository.',
+                    'title': 'Analisi e Pianificazione',
+                    'description': 'Raccolta requisiti e definizione architettura',
+                    'detailed_description': 'Fase iniziale del progetto con analisi dettagliata dei requisiti, definizione dell\'architettura tecnica e pianificazione delle attività.',
                     'order': 1,
                     'status': 'completed'
                 },
                 {
-                    'title': 'Infrastruttura Backend',
-                    'description': 'Setup server e database',
-                    'detailed_description': 'Configurazione server di sviluppo e database. Progettazione schema DB per utenti, dispositivi e proxy. Setup API base con autenticazione.',
+                    'title': 'Sviluppo Backend',
+                    'description': 'Implementazione API e database',
+                    'detailed_description': 'Sviluppo delle API REST, configurazione database e implementazione della logica di business principale.',
                     'order': 2,
-                    'status': 'completed'
-                },
-                {
-                    'title': 'Frontend Pubblico',
-                    'description': 'Sito vetrina e registrazioni',
-                    'detailed_description': 'Sviluppo sito vetrina responsive. Implementazione registrazione utenti e integrazione gateway pagamenti.',
-                    'order': 3,
                     'status': 'in_progress'
                 },
                 {
-                    'title': 'Pannello Utente',
-                    'description': 'Dashboard e controlli utente',
-                    'detailed_description': 'Implementazione dashboard utente con stato proxy, credenziali, log utilizzo e funzioni di controllo.',
+                    'title': 'Frontend e UI',
+                    'description': 'Interfaccia utente e dashboard',
+                    'detailed_description': 'Creazione dell\'interfaccia utente, dashboard amministrativa e integrazione con le API backend.',
+                    'order': 3,
+                    'status': 'pending'
+                },
+                {
+                    'title': 'Testing e Deploy',
+                    'description': 'Test completi e messa in produzione',
+                    'detailed_description': 'Fase di testing completo, correzione bug, ottimizzazioni performance e deploy in ambiente di produzione.',
                     'order': 4,
-                    'status': 'pending'
-                },
-                {
-                    'title': 'Backend Admin',
-                    'description': 'Pannello amministrazione',
-                    'detailed_description': 'Modulo gestione utenti, dispositivi e proxy. Controlli remoti e logs di sistema.',
-                    'order': 5,
-                    'status': 'pending'
-                },
-                {
-                    'title': 'Sicurezza',
-                    'description': 'Hardening e test sicurezza',
-                    'detailed_description': 'Implementazione sistemi di alert, rate limiting, test sicurezza e dockerizzazione.',
-                    'order': 6,
-                    'status': 'pending'
-                },
-                {
-                    'title': 'Collaudo',
-                    'description': 'Test e correzioni',
-                    'detailed_description': 'Deploy ambiente test, sessioni di test con casi reali, correzione bug.',
-                    'order': 7,
-                    'status': 'pending'
-                },
-                {
-                    'title': 'Consegna',
-                    'description': 'Documentazione e deploy',
-                    'detailed_description': 'Consegna codice sorgente, manuale utente e pacchetto Docker.',
-                    'order': 8,
-                    'status': 'pending'
-                },
-                {
-                    'title': 'Supporto',
-                    'description': 'Garanzia 3 mesi',
-                    'detailed_description': 'Correzione bug, supporto tecnico e possibili evoluzioni future.',
-                    'order': 9,
                     'status': 'pending'
                 }
             ]
@@ -231,8 +197,8 @@ def init_db():
             
             # Crea settings iniziali
             settings = ProjectSettings(
-                project_name='Piattaforma Proxy 4G/5G',
-                current_milestone_id=3
+                project_name='Roadmap Project',
+                current_milestone_id=2
             )
             db.session.add(settings)
             
