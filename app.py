@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -7,6 +7,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///roadmap.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Password per l'admin (cambia questa!)
+ADMIN_PASSWORD = 'admin123'
 
 db = SQLAlchemy(app)
 
@@ -43,16 +46,39 @@ def index():
                          current_milestone=settings.current_milestone_id,
                          project_name=settings.project_name)
 
-# Route admin
+# Route per il login admin
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin'))
+        else:
+            flash('Password non corretta!')
+            return render_template('admin_login.html', error=True)
+    
+    return render_template('admin_login.html')
+
+# Route per il logout admin
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
+
+# Route admin protetta
 @app.route('/admin')
 def admin():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
     milestones = Milestone.query.order_by(Milestone.order).all()
     settings = ProjectSettings.query.first()
     return render_template('admin.html', 
                          milestones=milestones,
                          settings=settings)
 
-# API per gestire milestone
+# API per gestire milestone (protette)
 @app.route('/api/milestone/<int:id>')
 def get_milestone(id):
     milestone = Milestone.query.get_or_404(id)
@@ -67,6 +93,9 @@ def get_milestone(id):
 
 @app.route('/api/milestone', methods=['POST'])
 def create_milestone():
+    if 'admin_logged_in' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
     data = request.json
     milestone = Milestone(
         title=data['title'],
@@ -81,6 +110,9 @@ def create_milestone():
 
 @app.route('/api/milestone/<int:id>', methods=['PUT'])
 def update_milestone(id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
     milestone = Milestone.query.get_or_404(id)
     data = request.json
     
@@ -95,6 +127,9 @@ def update_milestone(id):
 
 @app.route('/api/milestone/<int:id>', methods=['DELETE'])
 def delete_milestone(id):
+    if 'admin_logged_in' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
     milestone = Milestone.query.get_or_404(id)
     db.session.delete(milestone)
     db.session.commit()
@@ -102,6 +137,9 @@ def delete_milestone(id):
 
 @app.route('/api/settings', methods=['POST'])
 def update_settings():
+    if 'admin_logged_in' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
     settings = ProjectSettings.query.first()
     if not settings:
         settings = ProjectSettings()
@@ -202,4 +240,4 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
