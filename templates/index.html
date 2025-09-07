@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name }} - Roadmap</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .roadmap-container {
+            padding: 60px 30px;
+            position: relative;
+        }
+
+        .timeline {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 40px 0;
+            overflow-x: auto;
+            min-height: 200px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #e74c3c, #f39c12, #2ecc71);
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .milestone {
+            position: relative;
+            flex: 1;
+            max-width: 200px;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .milestone:hover {
+            transform: translateY(-5px);
+        }
+
+        .milestone-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border: 4px solid white;
+            box-shadow: 0 0 0 3px #ddd;
+        }
+
+        .milestone.completed .milestone-dot {
+            background: #2ecc71;
+            box-shadow: 0 0 0 3px #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        .milestone.in_progress .milestone-dot {
+            background: #f39c12;
+            box-shadow: 0 0 0 3px #f39c12;
+            animation: pulse 2s infinite;
+        }
+
+        .milestone.pending .milestone-dot {
+            background: #95a5a6;
+            box-shadow: 0 0 0 3px #95a5a6;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(46, 204, 113, 0.3); }
+            100% { box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.7); }
+        }
+
+        .milestone-content {
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .milestone:hover .milestone-content {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .milestone-description {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .milestone-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .status-in_progress {
+            background: #fdeaa7;
+            color: #f39c12;
+        }
+
+        .status-pending {
+            background: #ecf0f1;
+            color: #95a5a6;
+        }
+
+        .admin-link {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-link:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-text {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .timeline {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .timeline::before {
+                width: 4px;
+                height: 100%;
+                left: 50%;
+                top: 0;
+                transform: translateX(-50%);
+            }
+            
+            .milestone {
+                margin: 20px 0;
+                max-width: 300px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-rocket"></i> {{ project_name }}</h1>
+            <p>Roadmap di Sviluppo</p>
+        </div>
+
+        <div class="roadmap-container">
+            <div class="progress-indicator">
+                <div class="progress-text">Progresso Generale</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ ((milestones|selectattr('status', 'equalto', 'completed')|list|length + milestones|selectattr('status', 'equalto', 'in_progress')|list|length * 0.5) / milestones|length * 100)|round }}%"></div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                {% for milestone in milestones %}
+                <div class="milestone {{ milestone.status }}" data-milestone-id="{{ milestone.id }}">
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-content">
+                        <div class="milestone-title">{{ milestone.title }}</div>
+                        <div class="milestone-description">{{ milestone.description }}</div>
+                        <div class="milestone-status status-{{ milestone.status }}">
+                            {% if milestone.status == 'completed' %}
+                                Completato
+                            {% elif milestone.status == 'in_progress' %}
+                                In Corso
+                            {% else %}
+                                In Attesa
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <a href="/admin" class="admin-link" title="Pannello Admin">
+        <i class="fas fa-cog"></i>
+    </a>
+
+    <!-- Modal -->
+    <div id="milestoneModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalDescription"></div>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+            <div id="modalDetailedDescription"></div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('milestoneModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const milestones = document.querySelectorAll('.milestone');
+
+        milestones.forEach(milestone => {
+            milestone.addEventListener('click', function() {
+                const milestoneId = this.dataset.milestoneId;
+                
+                fetch(`/api/milestone/${milestoneId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('modalTitle').textContent = data.title;
+                        document.getElementById('modalDescription').innerHTML = `<strong>Descrizione:</strong> ${data.description}`;
+                        document.getElementById('modalDetailedDescription').innerHTML = `<strong>Dettagli:</strong><br>${data.detailed_description}`;
+                        modal.style.display = 'block';
+                    });
+            });
+        });
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Smooth animations on load
+        window.addEventListener('load', function() {
+            const milestones = document.querySelectorAll('.milestone');
+            milestones.forEach((milestone, index) => {
+                setTimeout(() => {
+                    milestone.style.opacity = '0';
+                    milestone.style.transform = 'translateY(20px)';
+                    milestone.style.transition = 'all 0.5s ease';
+                    
+                    requestAnimationFrame(() => {
+                        milestone.style.opacity = '1';
+                        milestone.style.transform = 'translateY(0)';
+                    });
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
