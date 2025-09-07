@@ -299,3 +299,284 @@
         <h2><i class="fas fa-cogs"></i> Admin Panel</h2>
         <div class="nav-item active" data-section="milestones">
             <i class="fas fa-list"></i>
+            Gestione Milestone
+        </div>
+        <div class="nav-item" data-section="settings">
+            <i class="fas fa-cog"></i>
+            Impostazioni Progetto
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard Admin</h1>
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Visualizza Roadmap
+            </a>
+        </div>
+
+        <!-- Sezione Milestone -->
+        <div id="milestones" class="section active">
+            <div class="card">
+                <h3><i class="fas fa-plus"></i> Aggiungi Nuova Milestone</h3>
+                <form id="milestoneForm">
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="title">Titolo</label>
+                            <input type="text" id="title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="order">Ordine</label>
+                            <input type="number" id="order" class="form-control" value="{{ milestones|length + 1 }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Descrizione Breve</label>
+                        <input type="text" id="description" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="detailed_description">Descrizione Dettagliata</label>
+                        <textarea id="detailed_description" class="form-control" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Stato</label>
+                        <select id="status" class="form-control">
+                            <option value="pending">In Attesa</option>
+                            <option value="in_progress">In Corso</option>
+                            <option value="completed">Completato</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salva Milestone
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-tasks"></i> Milestone Esistenti</h3>
+                <div id="milestonesList">
+                    {% for milestone in milestones %}
+                    <div class="milestone-item" data-id="{{ milestone.id }}">
+                        <div class="milestone-header">
+                            <div class="milestone-title">{{ milestone.order }}. {{ milestone.title }}</div>
+                            <div class="milestone-actions">
+                                <span class="status-badge badge-{{ milestone.status }}">
+                                    {% if milestone.status == 'completed' %}Completato
+                                    {% elif milestone.status == 'in_progress' %}In Corso
+                                    {% else %}In Attesa{% endif %}
+                                </span>
+                                <button class="btn btn-warning btn-sm" onclick="editMilestone({{ milestone.id }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteMilestone({{ milestone.id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p><strong>Descrizione:</strong> {{ milestone.description }}</p>
+                        {% if milestone.detailed_description %}
+                        <p><strong>Dettagli:</strong> {{ milestone.detailed_description[:100] }}...</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione Impostazioni -->
+        <div id="settings" class="section">
+            <div class="card">
+                <h3><i class="fas fa-sliders-h"></i> Impostazioni Progetto</h3>
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label for="project_name">Nome Progetto</label>
+                        <input type="text" id="project_name" class="form-control" value="{{ settings.project_name if settings else 'Il Mio Progetto' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="current_milestone">Milestone Corrente</label>
+                        <select id="current_milestone" class="form-control">
+                            {% for milestone in milestones %}
+                            <option value="{{ milestone.id }}" {% if settings and settings.current_milestone_id == milestone.id %}selected{% endif %}>
+                                {{ milestone.order }}. {{ milestone.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salva Impostazioni
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Modifica Milestone -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-edit"></i> Modifica Milestone</h2>
+            <form id="editMilestoneForm">
+                <input type="hidden" id="editId">
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="editTitle">Titolo</label>
+                        <input type="text" id="editTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editOrder">Ordine</label>
+                        <input type="number" id="editOrder" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Descrizione Breve</label>
+                    <input type="text" id="editDescription" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDetailedDescription">Descrizione Dettagliata</label>
+                    <textarea id="editDetailedDescription" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Stato</label>
+                    <select id="editStatus" class="form-control">
+                        <option value="pending">In Attesa</option>
+                        <option value="in_progress">In Corso</option>
+                        <option value="completed">Completato</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Annulla</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salva Modifiche
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all nav items and sections
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked nav item and corresponding section
+                this.classList.add('active');
+                document.getElementById(this.dataset.section).classList.add('active');
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('editModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        closeBtn.onclick = closeModal;
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Add milestone
+        document.getElementById('milestoneForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                detailed_description: document.getElementById('detailed_description').value,
+                order: parseInt(document.getElementById('order').value),
+                status: document.getElementById('status').value
+            };
+
+            fetch('/api/milestone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Errore nel salvare la milestone');
+                }
+            });
+        });
+
+        // Edit milestone
+        function editMilestone(id) {
+            fetch(`/api/milestone/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editTitle').value = data.title;
+                    document.getElementById('editDescription').value = data.description;
+                    document.getElementById('editDetailedDescription').value = data.detailed_description || '';
+                    document.getElementById('editOrder').value = data.order;
+                    document.getElementById('editStatus').value = data.status;
+                    modal.style.display = 'block';
+                });
+        }
+
+        // Update milestone
+        document.getElementById('editMilestoneForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editId').value;
+            const formData = {
+                title: document.getElementById('editTitle').value,
+                description: document.getElementById('editDescription').value,
+                detailed_description: document.getElementById('editDetailedDescription').value,
+                order: parseInt(document.getElementById('editOrder').value),
+                status: document.getElementById('editStatus').value
+            };
+
+            fetch(`/api/milestone/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Errore nel salvare le modifiche');
+                }
+            });
+        });
+
+        // Delete milestone
+        function deleteMilestone(id) {
+            if (confirm('Sei sicuro di voler eliminare questa milestone?')) {
+                fetch(`/api/milestone/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Errore nell\'eliminare la milestone');
+                    }
+                });
+            }
+        }
+
+        // Update settings
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                project_name: document.getElementById('project_name').value,
+            
