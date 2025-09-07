@@ -12,7 +12,7 @@ A modern Flask webapp for visualizing and managing project roadmaps. Perfect for
 ## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/yourusername/roadmap-webapp.git
+git clone https://github.com/iris1801/RoadmapMaker
 cd roadmap-webapp
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
