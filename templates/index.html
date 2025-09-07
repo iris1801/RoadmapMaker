@@ -61,8 +61,6 @@
             min-height: 200px;
         }
 
-
-
         .milestone {
             position: relative;
             flex: 1;
@@ -252,13 +250,34 @@
             transition: width 1s ease;
         }
 
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .empty-state h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
         @media (max-width: 768px) {
             .timeline {
                 flex-direction: column;
                 align-items: center;
             }
-            
-
             
             .milestone {
                 margin: 20px 0;
@@ -279,6 +298,7 @@
         </div>
 
         <div class="roadmap-container">
+            {% if milestones %}
             <div class="progress-indicator">
                 <div class="progress-text">Progresso Generale</div>
                 <div class="progress-bar">
@@ -306,6 +326,14 @@
                 </div>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-map-marked-alt"></i>
+                <h2>Nessuna Milestone Configurata</h2>
+                <p>Utilizza il pannello admin per aggiungere le milestone del tuo progetto.<br>
+                   Clicca sull'icona dell'ingranaggio in basso a destra per iniziare.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
