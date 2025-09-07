@@ -105,8 +105,8 @@ This project is released under the MIT License - see [LICENSE](LICENSE) file for
 
 ## 📞 Contact
 
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **Email**: your-email@example.com
+- **GitHub**: [@iris1801](https://github.com/iris1801)
+- **Email**: matteo@idrainformatica.it
 
 ---
 
